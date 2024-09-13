@@ -1,0 +1,188 @@
+* about **********************************************************************
+
+tim.h is an immediate mode toolkit for creating simple terminal guis
+
+* quick start ****************************************************************
+
+#include "tim.h"                                // one header, no lib
+int main(void) {                                //
+    while (tim_run(0)) {                        // event loop
+        scope (A, A, 24, 8) {                   // centered 28x8 scope
+            uint64_t c = 0x0a060f;              // three colors
+            frame(0, 0, ~0, ~0, c);             // draw frame for scope
+            label("Greetings!", A, 2, A, A, c); // label in top center
+            if (button("OK", A, ~1, 8, A, c))   // button in bottom center
+                return 0;                       // exit on button click
+            if (is_key_press('q'))              // ctrl-c is masked
+                return 0;                       // exit on 'q' press
+        }                                       //
+    }                                           //
+}                                               // automatic cleanup
+
+* layout *********************************************************************
+
+The terminal's columns (x) and rows (y) are addressed by their coordinates,
+the origin is in the top left corner.
+
+Scopes are the primary layout mechanism. They are used to group and place
+multiple elements. Scopes can be nested.
+The root scope is the full terminal screen. The scope macro is constructed
+with a for loop, so statements like break or return inside the scope block
+will probably give you a bad time.
+
+Most elements take x/y/w/h arguments to control placement. All positions are
+given in relation the element's parent scope.
+
+Automatic (A) width and height are either based on the element's content, or
+take the full available space from parent.
+
+ arg | value | placement
+-----|-------|---------------------------------
+  x  |  n    | n columns to left
+  x  | ~n    | n columns to right
+  x  |  A    | center horizontally
+  y  |  n    | n rows to top
+  y  | ~n    | n rows to bottom
+  y  |  A    | center vertically
+  w  |  n    | n columns wide
+  w  | ~n    | fit width to n columns to right
+  w  |  A    | automatic width
+  h  |  n    | n rows high
+  h  | ~n    | fit height n rows to bottom
+  h  |  A    | automatic height
+
+* colors *********************************************************************
+
+Most elements have a uint64 color argument which holds up to eight colors.
+Typically byte 0 is the text color and byte 1 is the background color.
+
+For example 0x08040f encodes three colors. When used with a button the text
+is white (0f), the background is blue (04), and the frame is gray (08).
+
+The terminal should support xterm-256 colors. The TERM variable is ignored.
+The lower 16 colors vary across different terminals, so the upper 240 colors
+should be used if consistency is important.
+
+xterm-256 color chart
+https://upload.wikimedia.org/wikipedia/commons/1/15/Xterm_256color_chart.svg
+
+* events *********************************************************************
+
+tim_run blocks until it observes an event. Mouse and key events are always
+immediately followed by a draw event in order to make changes visible.
+The event is stored in tim.event.
+Some elements need to consume events, for example edit consumes the key
+event when focused in order to prevent other key handlers on acting on them.
+
+ event       | cause
+-------------|-----------------------
+ DRAW_EVENT  | input, timeout, resize
+ KEY_EVENT   | key press
+ MOUSE_EVENT | mouse click
+ VOID_EVENT  | consumed event
+
+* elements *******************************************************************
+
+frame (x, y, w, h, color)
+
+    Draw an empty frame and fill area.
+
+    x/y/w/h see layout documentation
+    color   background, frame
+
+label (str, x, y, w, h, color)
+
+    Draw text label. Automatic width and height are supported. Strings
+    exceeding width or height are clipped.
+
+    str     zero terminated string
+    x/y/w/h see layout documentation
+    color   background, text
+
+button (str, x, y, w, h, color) -> bool
+
+    Draw button. Automatic width and height are supported. Strings exceeding
+    width or height are clipped. Returns true when clicked.
+
+    str     zero terminated string
+    x/y/w/h see layout documentation
+    color   frame, background, text
+
+edit (state, x, y, w, color) -> bool
+
+    Draw text edit. Output is stored in state.str. Receives input events when
+    focused by mouse click. Escape or return relinquish focus. Returns true
+    when return is pressed.
+
+    state   pointer to persistent edit state struct
+    x/y/w   see layout documentation
+    color   f   rame, background, text
+
+check (str, state, x, y, w, color) -> bool
+
+    Draw check box. State determines how the box is checked. [x] when state
+    is non-zero, [ ] when state is zero, [-] when state is -1. A mouse click
+    toggles the state between one and zero and returns true.
+
+    str     zero terminated string
+    state   pointer to persistent state variable
+    x/y/w   see layout documentation
+    color   check, background, text
+
+radio (str, state, v, x, y, w, color) -> bool
+
+    Draw radio box. If state equals v, the box is selected. Radios are
+    grouped through a shared state. Within that group, each v must be unique.
+    A mouse click assigns v to state and returns true.
+
+    str     zero terminated string
+    state   pointer to persistent state variable
+    v       unique state value
+    x/y/w   see layout documentation
+    color   radio, background, text
+
+* functions ******************************************************************
+
+tim_run (fps) -> bool
+
+    Process events and render frame. Blocks until input is received or the
+    next frame is due. First call also initializes the terminal. When fps is
+    zero the function blocks until input is received. Key and mouse events
+    are immediately followed by a draw event, so the actual fps can be
+    significantly greater than requested. Always returns true. To reset the
+    terminal after a crash, run "reset".
+    The Ctrl-C interrupt is masked, so make sure to put an exit condition
+    like this at the end of the main loop:
+
+        if (is_key_press(ESCAPE_KEY))
+            exit(0);
+
+    fps     frames per second
+
+is_key_press (key) -> bool
+
+    Returns true if key was pressed.
+
+    key     char literal or one of the KEY constants, see constants
+
+time_us () -> int64
+
+    Returns monotonic clock value in microseconds. Not affected by summer
+    time or leap seconds.
+
+* useful links ***************************************************************
+
+https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
+https://learn.microsoft.com/en-us/windows/console/
+
+* bugs ***********************************************************************
+
+- Double buffering is still new, set ENABLE_DBUF to 0 if you see glitches
+- Double width characters like 彁 are not fully supported. Terminals do not
+  handle these consistently and there is no portable way to reliably
+  determine character width. The renderer can deal with some of the problems
+  caused by this, but results may vary.
+- Decomposed (NFD) UTF-8 is not supported and will cause havoc
+- Zero width code points are not supported
+- Windows cmd.exe resize events may be delayed
+
