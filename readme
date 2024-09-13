@@ -7,7 +7,7 @@ tim.h is an immediate mode toolkit for creating simple terminal guis
 #include "tim.h"                                // one header, no lib
 int main(void) {                                //
     while (tim_run(0)) {                        // event loop
-        scope (A, A, 24, 8) {                   // centered 28x8 scope
+        scope (A, A, 24, 8) {                   // centered 24x8 scope
             uint64_t c = 0x0a060f;              // three colors
             frame(0, 0, ~0, ~0, c);             // draw frame for scope
             label("Greetings!", A, 2, A, A, c); // label in top center
