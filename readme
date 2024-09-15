@@ -1,6 +1,6 @@
 * about **********************************************************************
 
-tim.h is an immediate mode toolkit for creating simple terminal guis
+tim.h is a portable library to create simple terminal applications
 
 * quick start ****************************************************************
 
@@ -16,8 +16,8 @@ int main(void) {                                //
             if (is_key_press('q'))              // ctrl-c is masked
                 return 0;                       // exit on 'q' press
         }                                       //
-    }                                           //
-}                                               // automatic cleanup
+    }                                           // atexit cleanup
+}                                               //
 
 * layout *********************************************************************
 
@@ -26,12 +26,14 @@ the origin is in the top left corner.
 
 Scopes are the primary layout mechanism. They are used to group and place
 multiple elements. Scopes can be nested.
+
 The root scope is the full terminal screen. The scope macro is constructed
 with a for loop, so statements like break or return inside the scope block
 will probably give you a bad time.
 
-Most elements take x/y/w/h arguments to control placement. All positions are
-given in relation the element's parent scope.
+Elements (widget, control, component) are elements of user interaction, such
+as a button or edit box. Most elements take x/y/w/h arguments to control
+placement. All positions are given in relation the element's parent scope.
 
 Automatic (A) width and height are either based on the element's content, or
 take the full available space from parent.
@@ -50,6 +52,8 @@ take the full available space from parent.
   h  |  n    | n rows high
   h  | ~n    | fit height n rows to bottom
   h  |  A    | automatic height
+
+The layout automatically adopts to terminal window resize events.
 
 * colors *********************************************************************
 
@@ -70,9 +74,11 @@ https://upload.wikimedia.org/wikipedia/commons/1/15/Xterm_256color_chart.svg
 
 tim_run blocks until it observes an event. Mouse and key events are always
 immediately followed by a draw event in order to make changes visible.
-The event is stored in tim.event.
+
 Some elements need to consume events, for example edit consumes the key
 event when focused in order to prevent other key handlers on acting on them.
+
+The current event is stored in tim.event.
 
  event       | cause
 -------------|-----------------------
@@ -185,4 +191,28 @@ https://learn.microsoft.com/en-us/windows/console/
 - Decomposed (NFD) UTF-8 is not supported and will cause havoc
 - Zero width code points are not supported
 - Windows cmd.exe resize events may be delayed
+
+* license ********************************************************************
+
+MIT License
+
+Copyright (c) MMXXIV Chu'vok <chuvok@maeppi.e4ward.com>
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+The software is provided "as is", without warranty of any kind, express or
+implied, including but not limited to the warranties of merchantability,
+fitness for a particular purpose and noninfringement. In no event shall the
+authors or copyright holders be liable for any claim, damages or other
+liability, whether in an action of contract, tort or otherwise, arising from,
+out of or in connection with the software or the use or other dealings in the
+software.
 

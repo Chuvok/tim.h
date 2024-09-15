@@ -10,5 +10,6 @@ int main(void) {                                //
             if (is_key_press('q'))              // ctrl-c is masked
                 return 0;                       // exit on 'q' press
         }                                       //
-    }                                           //
-}                                               // automatic cleanup
+    }                                           // atexit cleanup
+}
+
