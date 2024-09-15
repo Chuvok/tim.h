@@ -1,6 +1,6 @@
 /* about **********************************************************************/
 
-// tim.h is an immediate mode toolkit for creating simple terminal guis
+// tim.h is a portable library to create simple terminal applications
 
 /* quick start ****************************************************************/
 
@@ -16,8 +16,8 @@
 //             if (is_key_press('q'))              // ctrl-c is masked
 //                 return 0;                       // exit on 'q' press
 //         }                                       //
-//     }                                           //
-// }                                               // automatic cleanup
+//     }                                           // atexit cleanup
+// }                                               //
 
 /* layout *********************************************************************/
 
@@ -26,12 +26,14 @@
 //
 // Scopes are the primary layout mechanism. They are used to group and place
 // multiple elements. Scopes can be nested.
+//
 // The root scope is the full terminal screen. The scope macro is constructed
 // with a for loop, so statements like break or return inside the scope block
 // will probably give you a bad time.
 //
-// Most elements take x/y/w/h arguments to control placement. All positions are
-// given in relation the element's parent scope.
+// Elements (widget, control, component) are elements of user interaction, such
+// as a button or edit box. Most elements take x/y/w/h arguments to control
+// placement. All positions are given in relation the element's parent scope.
 //
 // Automatic (A) width and height are either based on the element's content, or
 // take the full available space from parent.
@@ -50,6 +52,8 @@
 //   h  |  n    | n rows high
 //   h  | ~n    | fit height n rows to bottom
 //   h  |  A    | automatic height
+//
+// The layout automatically adopts to terminal window resize events.
 
 /* colors *********************************************************************/
 
@@ -70,9 +74,11 @@
 
 // tim_run blocks until it observes an event. Mouse and key events are always
 // immediately followed by a draw event in order to make changes visible.
-// The event is stored in tim.event.
+//
 // Some elements need to consume events, for example edit consumes the key
 // event when focused in order to prevent other key handlers on acting on them.
+//
+// The current event is stored in tim.event.
 //
 //  event       | cause
 // -------------|-----------------------
@@ -186,6 +192,30 @@
 // - Zero width code points are not supported
 // - Windows cmd.exe resize events may be delayed
 
+/* license ********************************************************************/
+
+// MIT License
+//
+// Copyright (c) MMXXIV Chu'vok <chuvok@maeppi.e4ward.com>
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// The software is provided "as is", without warranty of any kind, express or
+// implied, including but not limited to the warranties of merchantability,
+// fitness for a particular purpose and noninfringement. In no event shall the
+// authors or copyright holders be liable for any claim, damages or other
+// liability, whether in an action of contract, tort or otherwise, arising from,
+// out of or in connection with the software or the use or other dealings in the
+// software.
+
 /* includes *******************************************************************/
 
 // unix-like
@@ -278,11 +308,11 @@ enum {
 /* types **********************************************************************/
 
 struct cell {
-    uint8_t fg;       // foreground color
-    uint8_t bg;       // background color
-    uint8_t wide : 1; // wide or following wide character
-    uint8_t n;        // number of bytes in buf
-    uint8_t buf[4];   // utf8 code point
+    uint8_t fg;     // foreground color
+    uint8_t bg;     // background color
+    uint8_t wide;   // wide or following wide character
+    uint8_t n;      // number of bytes in buf
+    uint8_t buf[4]; // utf8 code point
 };
 
 struct rect {
@@ -323,7 +353,7 @@ struct state {
     int          w;                 // screen width
     int          h;                 // screen height
     int          frame;             // frame counter
-    struct event event;             // last event
+    struct event event;             // current event
     uintptr_t    focus;             // focused element
     int          loop_stage;        // loop stage
     bool         resized;           // screen was resized
@@ -490,9 +520,9 @@ static bool is_wide_perhaps(const uint8_t* s, int n) {
 
 /* unix ***********************************************************************/
 
-#ifdef TIM_UNIX
+// Unix-like terminal IO. Osx is missing ppoll and __unix__. Come on, fix it!
 
-// OSX is missing ppoll and __unix__. Come on, fix it!
+#ifdef TIM_UNIX
 
 static void write_str(const char* s, int size) {
     ssize_t _ = write(STDOUT_FILENO, s, size);
@@ -661,9 +691,8 @@ static inline int64_t time_us(void) {
 
 /* windows ********************************************************************/
 
-// Win32 is actually not that horrible as everyone says. Quirky but mostly well
-// documented. Interestingly cmd.exe is significantly slower than the new
-// windows terminal, which would mean write + flush block longer. I wonder why.
+// Windows terminal IO. Win32 is actually not that horrible as many say. Quirky
+// but well documented.
 
 #ifdef TIM_WINDOWS
 
@@ -1211,7 +1240,7 @@ static inline bool radio(const char* txt, int* state, int v, int x, int y,
 
 /* rendering ******************************************************************/
 
-// write character to outbut buffer
+// write character to output buffer
 static inline void put_chr(char c) {
     if (tim.buf_size + 1 < MAX_BUF) {
         tim.buf[tim.buf_size] = c;
