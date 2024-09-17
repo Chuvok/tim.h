@@ -1,6 +1,7 @@
 /* about **********************************************************************/
 
 // tim.h is a portable library to create simple terminal applications
+// Demo video: https://asciinema.org/a/zn3p0dsVCOQOzwY1S9gDfyaxQ
 
 /* quick start ****************************************************************/
 
