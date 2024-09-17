@@ -732,6 +732,7 @@ static void init_terminal(void) {
     tim.cp_out = GetConsoleOutputCP();             //
     SetConsoleCP(CP_UTF8);                         // set utf8 in/out code page
     SetConsoleOutputCP(CP_UTF8);                   //
+    write_str(S("\33[?1049h"));                    // use alternative buffe
     write_str(S("\33[?25l"));                      // disable cursor
     update_screen_size();                          //
 }
@@ -739,6 +740,7 @@ static void init_terminal(void) {
 static void reset_terminal(void) {
     write_str(S("\33[m"));                         // reset colors
     write_str(S("\33[?25h"));                      // show cursor
+    write_str(S("\33[?1049l"));                    // exit alternative buffer
     HANDLE hin  = GetStdHandle(STD_INPUT_HANDLE);  //
     HANDLE hout = GetStdHandle(STD_OUTPUT_HANDLE); //
     SetConsoleMode(hin, tim.mode_in);              // set original mode
