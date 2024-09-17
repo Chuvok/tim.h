@@ -455,11 +455,8 @@ static int utflen(const char* s) {
 
 // index of utf8 code point at pos
 static int utfpos(const char* s, int pos) {
-    if (pos < 0) {
-        return 0;
-    }
     int i = 0;
-    for (int n = 0; s && s[i]; i++) {
+    for (int n = 0; pos >= 0 && s && s[i]; i++) {
         n += (s[i] & 192) != 128;
         if (n == pos + 1) {
             return i;
@@ -580,17 +577,10 @@ static void reset_terminal(void) {
 static bool parse_input(struct event* restrict e, int n) {
     char* s = e->str;
 
-    if (s[0] == 127 && n == 1) {
-        // xterm backspace
-        e->type = KEY_EVENT;
-        e->key  = BACKSPACE_KEY;
-        return true;
-    }
-
-    if (s[0] != 27 || n == 1) {
+    if (n == 1 || s[0] != 27) {
         // regular key press
         e->type = KEY_EVENT;
-        e->key  = utfchr(s);
+        e->key  = s[0] == 127 ? BACKSPACE_KEY : utfchr(s);
         return true;
     }
 
@@ -624,7 +614,7 @@ static bool parse_input(struct event* restrict e, int n) {
         {"[6~", PAGEDOWN_KEY},
     };
 
-    if (s[0] == 27 && (n == 3 || n == 4)) {
+    if ((n == 3 || n == 4) && s[0] == 27) {
         // key sequence
         for (int i = 0; i < ARRAY_SIZE(key_table); i++) {
             if (!memcmp(s + 1, key_table[i].s, n - 1)) {
@@ -1314,9 +1304,9 @@ static void render(void) {
         if (new_line || wide_flank || skip) {
             put_str(S("\33["));
             put_int((i / tim.w) + 1);
-            put_str(S(";"));
+            put_chr(';');
             put_int((i % tim.w) + 1);
-            put_str(S("H"));
+            put_chr('H');
         }
         wide = c.wide || wide_spill;
         skip = false;

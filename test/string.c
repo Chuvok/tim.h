@@ -38,6 +38,7 @@ int main(void) {
     TEST(utflen("$€𐍈") == 3);
 
     TEST(utfpos(NULL, 0)  == 0);
+    TEST(utfpos("ab", -1) == 0);
     TEST(utfpos("äbc", 0) == 0);
     TEST(utfpos("äbc", 1) == 2);
     TEST(utfpos("äbc", 2) == 3);
