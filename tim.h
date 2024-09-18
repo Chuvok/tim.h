@@ -891,7 +891,7 @@ static inline bool is_event_key(int type, int32_t key) {
 }
 
 // returns true if event was press of key
-static bool inline is_key_press(int32_t key) {
+static inline bool is_key_press(int32_t key) {
     return is_event_key(KEY_EVENT, key);
 }
 
