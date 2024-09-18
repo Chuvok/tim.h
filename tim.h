@@ -647,7 +647,7 @@ static bool parse_input(struct event* restrict e, int n) {
 
     if ((n == 3 || n == 4) && s[0] == 27) {
         // key sequence
-        for (int i = 0; i < ARRAY_SIZE(key_table); i++) {
+        for (int i = 0; i < (int)ARRAY_SIZE(key_table); i++) {
             if (!memcmp(s + 1, key_table[i].s, n - 1)) {
                 e->type = KEY_EVENT;
                 e->key  = key_table[i].k;
@@ -1116,7 +1116,7 @@ static inline bool button(const char* txt, int x, int y, int w, int h,
 static void edit_insert(struct edit* e, const char* s) {
     int dst_size = ztrlen(e->str);
     int src_size = ztrlen(s);
-    if (dst_size + src_size + 1 < sizeof(e->str)) {
+    if (dst_size + src_size + 1 < (int)sizeof(e->str)) {
         int len = utflen(s); // usually 1, except when smashing keys
         int cur = utfpos(e->str, e->cursor);
         memmove(e->str + cur + src_size, e->str + cur, dst_size - cur);
