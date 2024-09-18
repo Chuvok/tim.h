@@ -193,6 +193,35 @@
 // - Zero width code points are not supported
 // - Windows cmd.exe resize events may be delayed
 
+/* compatibility **************************************************************/
+
+//  emulator         | support | remarks
+// ------------------|---------|----------------------------------
+//  Alacritty        | ?       |
+//  cmd.exe          | good    | resize may lag
+//  Cool Retro Term  | good    | wide character spill
+//  Deepin Terminal  | good    | wide character spill
+//  Eterm            | abysmal | garbled output
+//  GNOME Terminal   | full    |
+//  GNUstep Terminal | abysmal | garbled output
+//  iTerm2           | ?       |
+//  kitty            | full    |
+//  Konsole          | full    |
+//  LXTerminal       | full    |
+//  macOS Terminal   | ?       |
+//  PuTTY            | full    |
+//  QTerminal        | good    | wide character spill
+//  rxvt-unicode     | full    |
+//  GNU Screen       | good    | no alternative buffer, double esc
+//  st               | full    |
+//  Terminator       | full    |
+//  Terminology      | full    |
+//  tmux             | good    | esc lags
+//  Windows Terminal | full    |
+//  Xfce Terminal    | full    |
+//  XTerm            | full    | XTerm is law
+//  Zutty            | full    |
+
 /* license ********************************************************************/
 
 // MIT License
