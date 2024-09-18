@@ -56,7 +56,7 @@ static void game(void) {
         snek.state = crash ? OVER : snek.state;
         // food
         if (snek.food.xy == snek.body[0].xy) {
-            snek.len    = MIN(snek.len + 2, ARRAY_SIZE(snek.body));
+            snek.len    = MIN(snek.len + 2, (int)ARRAY_SIZE(snek.body));
             snek.food.x = rand() % (tim.w / 2 - 2) + 1;
             snek.food.y = rand() % (tim.h - 2) + 1;
         }
