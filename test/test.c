@@ -64,7 +64,7 @@ static inline void test_screen(struct event* e) {
 
     // edit
     static struct edit ed1 = {.str = "Edit 1"};
-    static struct edit ed2 = {};
+    static struct edit ed2 = {0};
     edit(&ed1, 1, 10, 32, 0xff00ff);
     sprintf(buf, "cursor: %d length: %d", ed1.cursor, ed1.length);
     label(buf, 2, 13, A, A, 0xf);
@@ -106,7 +106,7 @@ static inline void test_screen(struct event* e) {
         label("$£ह€𐍈6789", 1, 2, A, A, 0x0f05);
         label("圍棋56789", 1, 3, A, A, 0x0f05);
     }
-};
+}
 
 int main(void) {
     while (tim_run(1.5)) {
