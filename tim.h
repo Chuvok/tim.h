@@ -1194,21 +1194,22 @@ static bool edit_event(struct edit* e, struct rect r) {
 static inline bool edit(struct edit* e, int x, int y, int w, uint64_t color) {
     struct rect r = abs_xywh(x, y, w, 3);
 
-    // uninitialized
+    // uninitialized edit state
     if (e->str[0] && e->cursor == 0 && e->length == 0) {
         e->length = utflen(e->str);
         e->cursor = e->length;
     }
 
-    draw_box(r.x, r.y, r.w, r.h, color >> 16, color >> 8);
-
-    if (tim.focus == (uintptr_t)e) {
-        int cur = MIN(r.w - 4, e->cursor);
-        int off = utfpos(e->str, e->cursor - r.w + 4);
-        draw_str(e->str + off, r.x + 2, r.y + 1, r.w - 3, color, color >> 8);
-        draw_invert(r.x + cur + 2, r.y + 1, 1);
-    } else {
-        draw_str(e->str, r.x + 2, r.y + 1, r.w - 3, color, color >> 8);
+    if (tim.event.type == DRAW_EVENT) {
+        draw_box(r.x, r.y, r.w, r.h, color >> 16, color >> 8);
+        if (tim.focus == (uintptr_t)e) {
+            char* str = e->str + utfpos(e->str, e->cursor - r.w + 4);
+            int   cur = MIN(r.w - 4, e->cursor);
+            draw_str(str, r.x + 2, r.y + 1, r.w - 3, color, color >> 8);
+            draw_invert(r.x + cur + 2, r.y + 1, 1);
+        } else {
+            draw_str(e->str, r.x + 2, r.y + 1, r.w - 3, color, color >> 8);
+        }
     }
 
     return edit_event(e, r);
