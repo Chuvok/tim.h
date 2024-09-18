@@ -598,22 +598,22 @@ static bool parse_input(struct event* restrict e, int n) {
     }
 
     static struct {char s[4]; int k;} key_table[] = {
-        {"[A" , UP_KEY},
-        {"[B" , DOWN_KEY},
-        {"[C" , RIGHT_KEY},
-        {"[D" , LEFT_KEY},
-        {"[2~", INSERT_KEY}, // xterm
-        {"[4h", INSERT_KEY}, //
-        {"[3~", DELETE_KEY}, // xterm
-        {"[P" , DELETE_KEY}, //
-        {"[H" , HOME_KEY},   // xterm
-        {"[1~", HOME_KEY},   // tmux
-        {"[7~", HOME_KEY},   // rxvt
-        {"[F" , END_KEY},    // xterm
-        {"[4~", END_KEY},    // tmux
-        {"[8~", END_KEY},    // rxvt
-        {"[5~", PAGEUP_KEY},
-        {"[6~", PAGEDOWN_KEY},
+        {"[A" , UP_KEY},       //
+        {"[B" , DOWN_KEY},     //
+        {"[C" , RIGHT_KEY},    //
+        {"[D" , LEFT_KEY},     //
+        {"[2~", INSERT_KEY},   //
+        {"[4h", INSERT_KEY},   // st
+        {"[3~", DELETE_KEY},   //
+        {"[P" , DELETE_KEY},   // st
+        {"[H" , HOME_KEY},     //
+        {"[1~", HOME_KEY},     // rxvt, lxterm, putty, tmux, screen
+        {"[7~", HOME_KEY},     // rxvt
+        {"[F" , END_KEY},      //
+        {"[4~", END_KEY},      // rxvt, lxterm, putty, tmux, screen, st
+        {"[8~", END_KEY},      // rxvt
+        {"[5~", PAGEUP_KEY},   //
+        {"[6~", PAGEDOWN_KEY}, //
     };
 
     if ((n == 3 || n == 4) && s[0] == 27) {
