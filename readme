@@ -212,7 +212,7 @@ https://learn.microsoft.com/en-us/windows/console/
  PuTTY            | full    |
  QTerminal        | good    | wide character spill
  rxvt-unicode     | full    |
- GNU Screen       | good    | no alternative buffer, double esc
+ GNU Screen       | good    | no alternate buffer, double esc
  st               | full    |
  Terminator       | full    |
  Terminology      | full    |

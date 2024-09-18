@@ -212,7 +212,7 @@
 //  PuTTY            | full    |
 //  QTerminal        | good    | wide character spill
 //  rxvt-unicode     | full    |
-//  GNU Screen       | good    | no alternative buffer, double esc
+//  GNU Screen       | good    | no alternate buffer, double esc
 //  st               | full    |
 //  Terminator       | full    |
 //  Terminology      | full    |
@@ -580,7 +580,7 @@ static void init_terminal(void) {
     cfmakeraw(&attr);                           // configure raw mode
     tcsetattr(STDOUT_FILENO, TCSADRAIN, &attr); // set new attributes
     write_str(S("\33[?2004l"));                 // reset bracketed paste mode
-    write_str(S("\33[?1049h"));                 // use alternative buffer
+    write_str(S("\33[?1049h"));                 // use alternate buffer
     write_str(S("\33[?25l"));                   // hide cursor
     write_str(S("\33[?1000h"));                 // enable mouse
     write_str(S("\33[?1002h"));                 // enable button events
@@ -598,7 +598,7 @@ static void reset_terminal(void) {
     write_str(S("\33[?1002l"));                     // disable mouse
     write_str(S("\33[m"));                          // reset colors
     write_str(S("\33[?25h"));                       // show cursor
-    write_str(S("\33[?1049l"));                     // exit alternative buffer
+    write_str(S("\33[?1049l"));                     // exit alternate buffer
 }
 
 // parse input stored in e->str
@@ -764,7 +764,7 @@ static void init_terminal(void) {
     tim.cp_out = GetConsoleOutputCP();             //
     SetConsoleCP(CP_UTF8);                         // set utf8 in/out code page
     SetConsoleOutputCP(CP_UTF8);                   //
-    write_str(S("\33[?1049h"));                    // use alternative buffe
+    write_str(S("\33[?1049h"));                    // use alternate buffer
     write_str(S("\33[?25l"));                      // disable cursor
     update_screen_size();                          //
 }
@@ -772,7 +772,7 @@ static void init_terminal(void) {
 static void reset_terminal(void) {
     write_str(S("\33[m"));                         // reset colors
     write_str(S("\33[?25h"));                      // show cursor
-    write_str(S("\33[?1049l"));                    // exit alternative buffer
+    write_str(S("\33[?1049l"));                    // exit alternate buffer
     HANDLE hin  = GetStdHandle(STD_INPUT_HANDLE);  //
     HANDLE hout = GetStdHandle(STD_OUTPUT_HANDLE); //
     SetConsoleMode(hin, tim.mode_in);              // set original mode
