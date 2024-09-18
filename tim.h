@@ -1086,7 +1086,7 @@ static inline void label(const char* str, int x, int y, int w, int h,
         struct rect r = abs_xywh(x, y, w, h);
         struct cell c = cell(" ", color, color >> 8);
         draw_lot(c, r.x, r.y, r.w, r.h);
-        struct line l = {str};
+        struct line l = {.str = str, .line = ""};
         for (int i = 0; next_line(&l); i++) {
             draw_str(l.line, r.x, r.y + i, l.width, c.fg, c.bg);
         }
