@@ -765,7 +765,6 @@ static void init_terminal(void) {
     SetConsoleCP(CP_UTF8);                         // set utf8 in/out code page
     SetConsoleOutputCP(CP_UTF8);                   //
     write_str(S("\33[?1049h"));                    // use alternate buffer
-    write_str(S("\33[?25l"));                      // disable cursor
     update_screen_size();                          //
 }
 
@@ -804,6 +803,9 @@ static void read_event(int timeout_ms) {
 
     while (true) {
         memset(e, 0, sizeof(*e));
+        // In cmd.exe the cursor somtimes reappears. This reliably hides it.
+        write_str(S("\33[?25l"));
+
         DWORD r = WaitForSingleObject(h, timeout_ms);
 
         if (r == WAIT_TIMEOUT) {
@@ -866,8 +868,6 @@ static void read_event(int timeout_ms) {
             // terminal width changes and not for the height. As a workaround
             // the screen size is updated every time an event is emitted.
             update_screen_size();
-            // For cmd.exe the cursor has to be hidden after each resize event.
-            write_str(S("\33[?25l"));
             return;
         }
     } // while
