@@ -807,7 +807,6 @@ static void read_event(int timeout_ms) {
         write_str(S("\33[?25l"));
 
         DWORD r = WaitForSingleObject(h, timeout_ms);
-
         if (r == WAIT_TIMEOUT) {
             e->type = DRAW_EVENT;
             update_screen_size(); // workaround, see WINDOW_BUFFER_SIZE_EVENT
